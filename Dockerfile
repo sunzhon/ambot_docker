@@ -2,7 +2,7 @@ FROM ubuntu:20.04
 # 维护者信息
 LABEL maintainer="suntao.hn@gmail.com"
 ENV DEBIAN_FRONTEND=noninteractive TZ=Asia/Shanghai
-ARG user=suntao usergroup=duo
+ARG user=suntao usergroup=biorobotics
 ENV user=${user}
 ENV AMBOT=/home/${user}/workspace/ambot
 RUN mkdir -p /home/${user}/workspace
@@ -19,9 +19,24 @@ RUN groupadd -g 1000 ${usergroup} && \
     echo "${user}:l" | chpasswd && \
     echo "Please add ambot repositoy at your computer: /home/${USER}/workspace/, otherwise, the image compile will fail"
 
+# instann and update ca
+RUN apt-get install -y ca-certificates && update-ca-certificates
 
-RUN sed -i s/archive.ubuntu.com/mirrors.aliyun.com/g /etc/apt/sources.list && \
-    sed -i s/security.ubuntu.com/mirrors.aliyun.com/g /etc/apt/sources.list 
+RUN echo "
+# Source in China 
+deb http://mirrors.aliyun.com/ubuntu/ focal main restricted universe multiverse
+deb-src http://mirrors.aliyun.com/ubuntu/ focal main restricted universe multiverse
+deb http://mirrors.aliyun.com/ubuntu/ focal-security main restricted universe multiverse
+deb-src http://mirrors.aliyun.com/ubuntu/ focal-security main restricted universe multiverse
+deb http://mirrors.aliyun.com/ubuntu/ focal-updates main restricted universe multiverse
+deb-src http://mirrors.aliyun.com/ubuntu/ focal-updates main restricted universe multiverse
+deb http://mirrors.aliyun.com/ubuntu/ focal-proposed main restricted universe multiverse
+deb-src http://mirrors.aliyun.com/ubuntu/ focal-proposed main restricted universe multiverse
+deb http://mirrors.aliyun.com/ubuntu/ focal-backports main restricted universe multiverse
+deb-src http://mirrors.aliyun.com/ubuntu/ focal-backports main restricted universe multiverse
+" >> /etc/apt/sources.list
+
+
 
 RUN apt-get update -y && apt-get upgrade -y
 
@@ -37,13 +52,14 @@ mkdir build && cd build && cmake .. && make && sudo make install
 RUN cd ${HOME} && git clone https://github.com/eigenteam/eigen-git-mirror && cd eigen-git-mirror && \
 mkdir build && cd build && cmake .. && make && sudo make install
 
+RUN sudo apt-get install openscenegraph && \ apt install build-dep openscenegraph
 RUN cd ${HOME} && git clone https://github.com/openscenegraph/OpenSceneGraph.git && cd osg && \
 mkdir build && cd build && cmake .. && make && sudo make install
 
 
 # install ros and ros package
 RUN cd ${HOME} && git clone https://github.com/sunzhon/ambot_install.git && cd ambot_install && \
-sh ./install_ros.sh
+source ./install_ros.sh
 
 RUN apt install ros-$(rosversion -d)-serial && apt-get install ros-$(rosversion -d)-dynamixel-workbench
 
@@ -51,8 +67,9 @@ RUN useradd -m docker && echo "docker:docker" | chpasswd && adduser docker sudo
 
  # 拷贝主机的目录内容 ambot
 #COPY . ./ambot/
+# 容器创建后，默认登陆以bash作为登陆环境
+RUN apt-get clean
 
-
-USER docker
+USER suntao
 CMD ["/bin/bash"]
 
