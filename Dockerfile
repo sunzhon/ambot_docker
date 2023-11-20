@@ -9,36 +9,17 @@ RUN mkdir -p /home/${user}/workspace
 WORKDIR /home/${user}/workspace
 
 
+RUN echo "deb-src http://mirrors.aliyun.com/ubuntu/ focal-backports main restricted universe multiverse \ deb http://mirrors.aliyun.com/ubuntu/ focal main restricted universe multiverse \ deb-src http://mirrors.aliyun.com/ubuntu/ focal main restricted universe multiverse \deb http://mirrors.aliyun.com/ubuntu/ focal-security main restricted universe multiverse \ deb-src http://mirrors.aliyun.com/ubuntu/ focal-security main restricted universe multiverse \ deb http://mirrors.aliyun.com/ubuntu/ focal-updates main restricted universe multiverse \ deb-src http://mirrors.aliyun.com/ubuntu/ focal-updates main restricted universe multiverse \ deb http://mirrors.aliyun.com/ubuntu/ focal-proposed main restricted universe multiverse \ deb-src http://mirrors.aliyun.com/ubuntu/ focal-proposed main restricted universe multiverse \ deb http://mirrors.aliyun.com/ubuntu/ focal-backports main restricted universe multiverse \ deb-src http://mirrors.aliyun.com/ubuntu/ focal-backports main restricted universe multiverse" >> /etc/apt/sources.list && apt-get update -y && apt-get upgrade -y
+
+
 # 添加普通用户组
 RUN groupadd -g 1000 ${usergroup} && \
 # 添加普通用户
     useradd --system --create-home --no-log-init --uid 1000 --groups ${usergroup} --shell /bin/bash ${user} && \
     adduser ${user} sudo && \
-
 # 给创建的用户设置密码，密码为: l
     echo "${user}:l" | chpasswd && \
-    echo "Please add ambot repositoy at your computer: /home/${USER}/workspace/, otherwise, the image compile will fail"
-
-# instann and update ca
-RUN apt-get install -y ca-certificates && update-ca-certificates
-
-RUN echo "
-# Source in China 
-deb http://mirrors.aliyun.com/ubuntu/ focal main restricted universe multiverse
-deb-src http://mirrors.aliyun.com/ubuntu/ focal main restricted universe multiverse
-deb http://mirrors.aliyun.com/ubuntu/ focal-security main restricted universe multiverse
-deb-src http://mirrors.aliyun.com/ubuntu/ focal-security main restricted universe multiverse
-deb http://mirrors.aliyun.com/ubuntu/ focal-updates main restricted universe multiverse
-deb-src http://mirrors.aliyun.com/ubuntu/ focal-updates main restricted universe multiverse
-deb http://mirrors.aliyun.com/ubuntu/ focal-proposed main restricted universe multiverse
-deb-src http://mirrors.aliyun.com/ubuntu/ focal-proposed main restricted universe multiverse
-deb http://mirrors.aliyun.com/ubuntu/ focal-backports main restricted universe multiverse
-deb-src http://mirrors.aliyun.com/ubuntu/ focal-backports main restricted universe multiverse
-" >> /etc/apt/sources.list
-
-
-
-RUN apt-get update -y && apt-get upgrade -y
+    apt-get install -y ca-certificates && update-ca-certificates
 
     # 安装常见软件库
 RUN apt-get update && apt-get install -y sudo vim curl pkg-config build-essential ninja-build automake autoconf libtool wget curl git gcc libssl-dev bc slib squashfs-tools  tree python3-dev python3-pip device-tree-compiler ssh cpio fakeroot libncurses5 libncurses5-dev genext2fs rsync unzip mtools tclsh ssh-client  && \
@@ -47,14 +28,14 @@ RUN apt-get update && apt-get install -y sudo vim curl pkg-config build-essentia
 
  
 RUN cd ${HOME} && git clone https://github.com/coin-or/qpOASES.git && cd qpOASES && \
-mkdir build && cd build && cmake .. && make && sudo make install
+mkdir build && cd build && cmake .. && make && sudo make install && cd ${HOME} && rm -rf qpOASES
 
 RUN cd ${HOME} && git clone https://github.com/eigenteam/eigen-git-mirror && cd eigen-git-mirror && \
-mkdir build && cd build && cmake .. && make && sudo make install
+mkdir build && cd build && cmake .. && make && sudo make install && cd ${HOME} && rm -rf eigen-git-mirror
 
-RUN sudo apt-get install openscenegraph && \ apt install build-dep openscenegraph
-RUN cd ${HOME} && git clone https://github.com/openscenegraph/OpenSceneGraph.git && cd osg && \
-mkdir build && cd build && cmake .. && make && sudo make install
+RUN apt-get update -y && apt-get upgrade -y && apt-get install -y openscenegraph  &&  sudo apt-get install -y build-dep openscenegraph && \
+cd ${HOME} && git clone https://github.com/openscenegraph/OpenSceneGraph.git && cd OpenSceneGraph && \
+mkdir build && cd build && cmake .. && make && sudo make install && cd ${HOME} && rm -rf OpenSceneGraph
 
 
 # install ros and ros package
