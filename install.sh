@@ -23,6 +23,6 @@ sudo usermod -aG docker $USER
 sudo systemctl start docker
 
 #2) create container of ambot execution env
-docker image pull sunzhon/ambot_env:0.4
-docker run -u suntao -it -v /dev/:/dev/ --privileged ambot_env:0.4 /bin/bash
+docker image pull sunzhon/ambot_env:0.5
+docker run -u root -it -v /dev/:/dev/ --privileged sunzhon/ambot_env:0.5 /bin/bash
 
