@@ -42,7 +42,10 @@ mkdir build && cd build && cmake .. && make && sudo make install && cd ${HOME} &
 RUN cd ${HOME} && git clone https://github.com/sunzhon/ambot_install.git && cd ambot_install && \
 source ./install_ros.sh
 
-RUN apt install ros-$(rosversion -d)-serial && apt-get install ros-$(rosversion -d)-dynamixel-workbench
+RUN apt install ros-$(rosversion -d)-serial && apt-get install ros-$(rosversion -d)-dynamixel-workbench && \
+cd $HOME && git clone https://github.com/ROBOTIS-GIT/DynamixelSDK.git && \
+cd DynamixelSDK/c++/build/linux64/ && make && sudo make install
+
 
 RUN useradd -m docker && echo "docker:docker" | chpasswd && adduser docker sudo
 
