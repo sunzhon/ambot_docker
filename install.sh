@@ -16,13 +16,13 @@ sudo apt-get update -y
 
 sudo apt-get install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
 
-sudo docker run hello-world && \
+#sudo docker run hello-world && \
 
 #Docker 需要用户具有 sudo 权限
 sudo usermod -aG docker $USER
 sudo systemctl start docker
 
-#2) create container of ambot execution env
-docker image pull sunzhon/ambot_env:0.5
-docker run -u root -it -v /dev/:/dev/ --privileged sunzhon/ambot_env:0.5 /bin/bash
+#2) create container of ambot execution env, ambot_env:0.52  is a version of single leg control
+docker image pull sunzhon/ambot_env:0.52
+docker run -u root -it -v /dev/:/dev/ --privileged sunzhon/ambot_env:0.52 /bin/bash
 
