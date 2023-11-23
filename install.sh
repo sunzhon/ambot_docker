@@ -24,5 +24,5 @@ sudo systemctl start docker
 
 #2) create container of ambot execution env, ambot_env:0.52  is a version of single leg control
 docker image pull sunzhon/ambot_env:0.52
-docker run -u root -it -v /dev/:/dev/ --privileged sunzhon/ambot_env:0.52 /bin/bash
+docker run -u root -it --name ambot -v /dev/:/dev/ --privileged sunzhon/ambot_env:0.52 /bin/bash
 
